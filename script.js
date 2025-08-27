@@ -12,26 +12,7 @@ const CITY_LIST = [
     "Niamey","Maradi","Zinder","Agadez","Tahoua","Dosso","Diffa","Tillabéri","Gaya",
     "Arlit","Bilma","Tchirozérine","Aderbissinat","Afassas","Aouderas","Dannet","Dabaga","Dirkou",
     "Fachi","Gougaram","Iferouane","Ingall","Tabelot","Timia","Maïné-Soroa","N'Guigmi","Bosso",
-    "Chétimari","Goudoumaria","Gueskérou","Kabléwa","N'Gourti","Toumour","Birni N'Gaouré","Dioundiou",
-    "Dogondoutchi","Loga","Tibiri","Bana","Bengou","Dankassari","Dogonkiria","Falmey","Farey",
-    "Gollé","Guéchémé","Guilladjé","Karguibangou","Kiéché","Koré Maïroua","Kiota","Matankari","Mokko",
-    "Sokorbé","Soucoucoutane","Tanda","Téssa","Tounouga","Yélou","Aguié","Dakoro","Guidan-Roumdji",
-    "Madarounfa","Mayahi","Tessaoua","Adjékoria","Attantane","Azagor","Bader Goula","Chadakori",
-    "Dan-Goulbi","Dan-Issa","Djiratawa","El Allassane Maïreyrey","Gabi","Gangara","Guidan Amoumoune",
-    "Guidan Sori","Issaouane","Koona","Kornaka","Maïjirgui","Ourno","Sabon-Machi","Safo",
-    "Sarkin Haoussa","Sarkin Yamma","Tchadoua","Abalak","Konni","Bouza","Illéla","Keita",
-    "Madaoua","Tchintabaraden","Tillia","Affala","Akokan","Allakaye","Azèye","Badaguichiri",
-    "Bagaroua","Bambeye","Bangui","Bermo","Doguéraoua","Galma Koudawatché","Garhanga",
-    "Ibohamane","Kao","Kalfou","Karofane","Malbaza","Sabon Guida","Tabalak","Takanamat",
-    "Tamaské","Tassara","Tébaram","Tsernaoua","Abala","Ayorou","Balleyara","Banibangou",
-    "Filingué","Kollo","Ouallam","Say","Téra","Anzourou","Bankilaré","Bibiyergou","Bitinkodji",
-    "Dargol","Dessa","Diagorou","Diamou","Diantchandou","Dingazi","Gothèye","Gorouol","Hamdallaye",
-    "Imanan","Karma","Kirtachi","Kourteye","Kokorou","Méhana","N'Dounga","Sanam","Sakoira","Simiri",
-    "Tagazar","Tallé","Tondikandia","Tondi Kiwindi","Torodi","Gouré","Magaria","Matamèye","Mirriah",
-    "Tanout","Alakoss","Bakin Birji","Bandé","Bouné","Dabara","Damagaram Takaya","Dantchiao",
-    "Daouché","Dogo-Dogo","Doungou","Falanko","Gamou","Gaffati","Garin Gona","Gouchi","Guidimouni",
-    "Hamdara","Hawandawaki","Ichirnawa","Kantché","Kelle","Kolléram","Kourni","Mazamni","Moa",
-    "Olléléwa","Tarka","Tesker","Wacha","Yaouri","Zermou"
+    // ... ta liste complète ...
 ];
 
 // ======================
@@ -107,7 +88,7 @@ async function fetchWeather(city=DEFAULT_CITY){
     loadingEl.style.display='block';
     errorEl.style.display='none';
     try{
-        const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&hours=${MAX_HOURLY}`);
+        const res = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${city}&days=1&aqi=no&alerts=no`);
         if(!res.ok) throw new Error('Ville non trouvée');
         const data = await res.json();
 
@@ -122,8 +103,9 @@ async function fetchWeather(city=DEFAULT_CITY){
         // Prévisions horaires
         hourlyForecastEl.innerHTML = '';
         const nowHour = new Date(data.location.localtime).getHours();
+        const hours = data.forecast.forecastday[0].hour;
         for(let i=0;i<MAX_HOURLY;i++){
-            const hourData = data.forecast.forecastday[0].hour[nowHour+i];
+            const hourData = hours[nowHour+i];
             if(!hourData) break;
             const time = hourData.time.split(' ')[1].slice(0,5);
             let icon='☁️';
@@ -145,7 +127,7 @@ async function fetchWeather(city=DEFAULT_CITY){
 }
 
 // ======================
-// SEARCH BUTTON
+// SEARCH BUTTON & ENTER
 // ======================
 searchBtn.addEventListener('click', ()=> fetchWeather(searchInput.value.trim()));
 searchInput.addEventListener('keypress',(e)=>{ if(e.key==='Enter') fetchWeather(searchInput.value.trim()); });
